@@ -1,8 +1,8 @@
 // import React from 'react';
 // import ReactDOM from 'react-dom/client';
 
-import { render } from './react-dom.js';
-import React, {  createElement } from './react.js';
+import ReactDOM from './react-dom.js';
+import React from './react.js';
 
 // let element = <h1 title={'123'}>Hello</h1>;
 
@@ -14,16 +14,20 @@ function greeting(name) {
   }
 }
 
-let element = createElement('div', {
+function FunctionComponent(props) { 
+  return <h1>hello, { props.name}</h1>
+}
+
+let element = React.createElement('div', {
   className: "title",
   style: {
     color: 'red',
   }
-}, createElement("span", null, "hello"), "world");
+}, React.createElement(FunctionComponent, {name: 'jingyuan'}), 'welcome');
 
 
-console.log(JSON.stringify(element, null, 2));
-render(element, document.getElementById('root'));
+console.log(element);
+ReactDOM.render(element, document.getElementById('root'));
 
 // const root = ReactDOM.createRoot(document.getElementById('root'));
 

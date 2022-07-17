@@ -13,6 +13,8 @@ function createDom(vdom) {
     let dom;
     if (type === REACT_TEXT) {
         dom = document.createTextNode('');
+    } else if (typeof type === 'function') { 
+        return mountFunctionComponent(vdom);
     } else { 
         dom = document.createElement(type);
     }
@@ -25,6 +27,13 @@ function createDom(vdom) {
     //dom属性挂载真实的dom;
     vdom.dom = dom;
     return dom;
+}
+
+//函数式组件的处理
+function mountFunctionComponent(vdom) { 
+    let { type, props } = vdom;
+    let funVdom = type(props);
+    return createDom(funVdom);
 }
 function reconcileChildren (childVdom, parentDom){
     childVdom.forEach(child => { 
@@ -39,7 +48,6 @@ function updateProps(dom, oldProps, newProps) {
     Object.keys(newProps)
         .filter(isProperty)
         .forEach(key => { 
-            console.log(key, newProps[key])
             if (key === 'style') {
                 let styleObj = newProps[key];
                 for (let attr in styleObj) {
@@ -51,8 +59,8 @@ function updateProps(dom, oldProps, newProps) {
         })
 }
 
-const ReactDom = {
+const ReactDOM = {
     render
 }
 
-export default ReactDom;
+export default ReactDOM;
