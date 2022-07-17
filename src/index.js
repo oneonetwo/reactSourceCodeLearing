@@ -1,8 +1,10 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
+// import React from 'react';
+// import ReactDOM from 'react-dom/client';
 
+import { render } from './react-dom.js';
+import React, {  createElement } from './react.js';
 
-let element = <h1 title={'123'}>Hello</h1>;
+// let element = <h1 title={'123'}>Hello</h1>;
 
 function greeting(name) { 
   if (name) {
@@ -12,12 +14,20 @@ function greeting(name) {
   }
 }
 
-let element2 = greeting('weiwie');
-console.log('element', element);
-console.log('element', element2);
-const root = ReactDOM.createRoot(document.getElementById('root'));
+let element = createElement('div', {
+  className: "title",
+  style: {
+    color: 'red',
+  }
+}, createElement("span", null, "hello"), "world");
 
-root.render(
-  element2
-);
+
+console.log(JSON.stringify(element, null, 2));
+render(element, document.getElementById('root'));
+
+// const root = ReactDOM.createRoot(document.getElementById('root'));
+
+// root.render(
+//   element1
+// );
 
