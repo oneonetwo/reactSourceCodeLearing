@@ -14,7 +14,11 @@ function createDom(vdom) {
     if (type === REACT_TEXT) {
         dom = document.createTextNode('');
     } else if (typeof type === 'function') { 
-        return mountFunctionComponent(vdom);
+        if (type.isReactComponent === true) {
+            return mountClassComponent(vdom);
+        } else { 
+            return mountFunctionComponent(vdom);
+        }
     } else { 
         dom = document.createElement(type);
     }
@@ -28,12 +32,19 @@ function createDom(vdom) {
     vdom.dom = dom;
     return dom;
 }
-
+//类组件的处理
+function mountClassComponent(vdom) {
+    let { type, props } = vdom;
+    let classInstance = new type(props);
+    let renderDom = classInstance.render();
+    return createDom(renderDom);
+    
+}
 //函数式组件的处理
 function mountFunctionComponent(vdom) { 
     let { type, props } = vdom;
-    let funVdom = type(props);
-    return createDom(funVdom);
+    let renderDom = type(props);
+    return createDom(renderDom);
 }
 function reconcileChildren (childVdom, parentDom){
     childVdom.forEach(child => { 
