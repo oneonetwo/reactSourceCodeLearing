@@ -1,3 +1,14 @@
+import { findDOM, compareTwoVdom } from "./react-dom";
+
+/*
+ * @Description: 
+ * @Author: yjy
+ * @Date: 2022-07-18 22:04:51
+ * @LastEditTime: 2022-07-19 23:54:58
+ * @LastEditors: yjy
+ * @Reference: 
+ */
+
 class Updater { 
     constructor(classInstance) { 
         this.classInstance = classInstance;
@@ -6,8 +17,8 @@ class Updater {
 
     }
     //partialState和callback没有一对一的关系
-    addState(partialStae, callback) { 
-        this.pendingStates.push(partialStae);
+    addState(partialState, callback) { 
+        this.pendingStates.push(partialState);
         if (typeof callback === 'function') { 
             this.callbacks.push(callback);
         }
@@ -51,10 +62,20 @@ export class Component {
         //每一个类组件的实例都有一个更新器updater
         this.updater = new Updater(this);
     }
-    setState(partialStae, callback) { 
-        this.updater.addState(partialStae, callback);
+    setState(partialState, callback) { 
+        this.updater.addState(partialState, callback);
     }
+    /**
+     * 组件的更新
+     * 1. 获取 老的虚拟dom React元素
+     * 2. 根据最新的属性和状态计算新的虚拟DOM
+     * 然后进行比较，查找差异，把这些差异同步到真实的dom
+     */
     forceUpdate() {
-        console.log('组件实例 forceUpdate');
+        let oldRenderVdom = this.oldRenderVdom; //老的虚拟dom
+        let oldDOM = findDOM(oldRenderVdom);//根据老的虚拟dom，找到老地真实dom;
+        let newRenderVdom = this.render();//
+        compareTwoVdom(oldDOM.parentNode, oldRenderVdom, newRenderVdom);//比较差异，把更新同步到真实的dom.
+        this.oldRenderVdom = newRenderVdom;
     }
 }

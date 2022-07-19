@@ -1,14 +1,22 @@
+/*
+ * @Author: jingyuan.yang jingyuan.yang@prnasia.com
+ * @Date: 2022-07-17 21:49:51
+ * @LastEditors: yjy
+ * @LastEditTime: 2022-07-20 00:05:42
+ * @FilePath: \zhufeng2022react_self\src\react-dom.js
+ * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
+ */
 import { REACT_TEXT } from "./constants";
 
 //把虚拟dom转成真实dom插入到容器中
 export function render(vdom, container) { 
-    let newDom = createDom(vdom);
+    let newDom = createDOM(vdom);
     container.appendChild(newDom);
 }
 /**
  * 把虚拟dom转成真实的dom 
  */
-function createDom(vdom) { 
+function createDOM(vdom) { 
     let { type, props } = vdom;
     let dom;
     if (type === REACT_TEXT) {
@@ -37,14 +45,17 @@ function mountClassComponent(vdom) {
     let { type, props } = vdom;
     let classInstance = new type(props);
     let renderDom = classInstance.render();
-    return createDom(renderDom);
+    //TODO
+    classInstance.oldRenderVdom = vdom.oldRenderVdom = renderDom; //把老的虚拟dom挂载到实例上
+    return createDOM(renderDom);
     
 }
 //函数式组件的处理
 function mountFunctionComponent(vdom) { 
     let { type, props } = vdom;
     let renderDom = type(props);
-    return createDom(renderDom);
+    vdom.oldRenderVdom = renderDom;
+    return createDOM(renderDom);
 }
 function reconcileChildren (childVdom, parentDom){
     childVdom.forEach(child => { 
@@ -72,6 +83,31 @@ function updateProps(dom, oldProps, newProps) {
         })
 }
 
+/**
+ * 
+ * @param {*} vdom 
+ * @returns 
+ */
+export function findDOM(vdom) { 
+    let { type } = vdom;
+    if (typeof type === 'function') {
+        //如果是函数的话，那么找到他的oldRenderVdom的真实DOM元素
+        return findDOM(vdom.oldRenderVdom);
+    } else { 
+        return vdom.dom;
+    }
+}
+/**
+ * 比较新旧的虚拟DOM. 找出差异，更新到真实DOM上
+ * @param {*} parentDOM 
+ * @param {*} oldVdom 
+ * @param {*} newVdom 
+ */
+export function compareTwoVdom(parentDOM, oldVdom, newVdom) { 
+    let oldDOM = findDOM(oldVdom);
+    let newDOM = createDOM(newVdom);
+    parentDOM.replaceChild(newDOM, oldDOM);
+}
 const ReactDOM = {
     render
 }

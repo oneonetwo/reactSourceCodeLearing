@@ -1,7 +1,6 @@
 // import React from 'react';
 // import ReactDOM from 'react-dom';
 
-import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
 import React from './react.js';
 
