@@ -64,6 +64,8 @@ function updateProps(dom, oldProps, newProps) {
                 for (let attr in styleObj) {
                     dom.style[attr] = styleObj[attr];
                 }
+            } else if (key.startsWith('on')) {  //onClick  =>  dom onclick
+                dom[key.toLocaleLowerCase()] = newProps[key];
             } else {
                 dom[key] = newProps[key];
              }
