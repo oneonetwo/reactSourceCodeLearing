@@ -1,13 +1,16 @@
 import { findDOM, compareTwoVdom } from "./react-dom";
 
-/*
- * @Description: 
- * @Author: yjy
- * @Date: 2022-07-18 22:04:51
- * @LastEditTime: 2022-07-19 23:54:58
- * @LastEditors: yjy
- * @Reference: 
- */
+export let updateQueue = {
+    isBatchingUpdate: false, //通过此变量来控制变量更新
+    updaters: [],
+    batchUpdate() { 
+        for (let updater of updateQueue.updaters) { 
+            updater.updateComponent();
+        }
+        updateQueue.isBatchingUpdate = false;
+        updateQueue.updaters.length = 0;
+    }
+}
 
 class Updater { 
     constructor(classInstance) { 
@@ -39,17 +42,23 @@ class Updater {
         return state;
     }
     //不管状态和属性的变化，都会让组件刷新，执行次方法。
-    emitUpdate() { 
-        this.updateComponent();//让组件更新
+    emitUpdate(nextProps) { 
+        this.nextProps = nextProps;
+        //如果当前处于批量更新模式，那么就把updater实例添加到updateQueue中
+        if (updateQueue.isBatchingUpdate) {
+            updateQueue.updaters.push(this);
+        } else { 
+            this.updateComponent();//让组件更新
+        }
     }
     updateComponent() { 
-        let { classInstance, pendingStates} = this;
-        if (pendingStates.length > 0) { //有需要等待的更新
-            shouldUpdate(classInstance, this.getState());
+        let { classInstance, pendingStates, nextProps} = this;
+        if (nextProps || pendingStates.length > 0) { //有需要等待的更新
+            shouldUpdate(classInstance, nextProps,this.getState());
         }
     }
 }
-function shouldUpdate(classInstance, nextState) { 
+function shouldUpdate(classInstance, nextProps, nextState) { 
     classInstance.state = nextState; //真正修改实例的状态
     classInstance.forceUpdate(); //然后调用组件实例的updateComponent进行更新
 }

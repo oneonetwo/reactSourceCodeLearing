@@ -2,12 +2,12 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-07-20 00:05:42
+ * @LastEditTime: 2022-07-20 22:24:06
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import { REACT_TEXT } from "./constants";
-
+import { addEvent } from './events';
 //把虚拟dom转成真实dom插入到容器中
 export function render(vdom, container) { 
     let newDom = createDOM(vdom);
@@ -76,7 +76,8 @@ function updateProps(dom, oldProps, newProps) {
                     dom.style[attr] = styleObj[attr];
                 }
             } else if (key.startsWith('on')) {  //onClick  =>  dom onclick
-                dom[key.toLocaleLowerCase()] = newProps[key];
+                // dom[key.toLocaleLowerCase()] = newProps[key];
+                addEvent(dom, key.toLocaleLowerCase(), newProps[key]);
             } else {
                 dom[key] = newProps[key];
              }
