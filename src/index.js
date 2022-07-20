@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-20 23:05:00
+ * @LastEditTime: 2022-07-21 00:01:16
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -11,44 +11,41 @@
 
 import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
-import React from './react.js';
+import React, { createRef } from './react.js';
 
-
-
-/**
- * setState可能是异步的
- */
-class Counter extends Component {
-  numberA;
-  numberB;
-  result;
+class TextInput extends Component {
   constructor(props) {
     super(props);
-    this.numberA = React.createRef();
-    this.numberB = React.createRef();
-    this.result = React.createRef();
+    this.inputRef = createRef();
   }
-  
-  handleClick = () => {
-    //回调是在更新后执行的
-    let numberA = this.numberA.current.value;
-    let numberB = this.numberB.current.value;
-    this.result.current.value = parseFloat(numberA) + parseFloat(numberB);
+  getFocus = () => {
+    this.inputRef.current.focus();
   }
-  render() { 
-    return <div>
-      <input ref={ this.numberA}></input>
-      <input ref={ this.numberB}></input>
-      <button onClick={ this.handleClick}> + </button>
-      <br />
-      <input ref={ this.result}></input>
-    </div>
+  render() {
+    return <input ref={this.inputRef}></input>
   }
 }
 
+class Form extends Component {
+  constructor(props) {
+    super(props);
+    this.textInputRef = createRef();
+  }
+  getInputFocus = () => {
+    // this.formRef.current指向类组件的实例
+    this.textInputRef.current.getFocus();
+  }
+  render() {
+    return (
+      <div>
+        <TextInput ref={this.textInputRef}></TextInput>
+        <button onClick={this.getInputFocus}>获取焦点</button>
+      </div>
+    )
+  }
+}
 
-
-ReactDOM.render(<Counter />, document.getElementById('root'));
+ReactDOM.render(<Form />, document.getElementById('root'));
 
 // const root = ReactDOM.createRoot(document.getElementById('root'));
 

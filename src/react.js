@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-07-20 23:16:17
+ * @LastEditTime: 2022-07-21 00:02:59
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -11,11 +11,10 @@ import { Component }  from "./Component.js";
 
 export function createElement(type, props, ...children) {
     let { ref, key, ...resProps } = props;
-
-     return {
+    return {
          type,
-         ref,//获取虚拟dom实例
-         key,//区分父亲的不同儿子
+         ref: ref,//获取虚拟dom实例
+         key: key,//区分父亲的不同儿子
          props: {
              ...resProps,
              children: children.map(child => {
@@ -27,7 +26,7 @@ export function createElement(type, props, ...children) {
      }
 }
 export function createRef(defaultValue) { 
-    return {current: defaultValue||null}
+    return {current: null}
 }
 
 const React = {
