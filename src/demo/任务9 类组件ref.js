@@ -2,22 +2,29 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-21 00:33:14
+ * @LastEditTime: 2022-07-21 00:01:16
  * @LastEditors: yjy
  * @Reference: 
  */
 // import React from 'react';
 // import ReactDOM from 'react-dom';
 
-
 import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
-import React, { createRef, forwardRef } from './react.js';
+import React, { createRef } from './react.js';
 
-function TextInput(props, ref) { 
-  return <input ref={ref} />
+class TextInput extends Component {
+  constructor(props) {
+    super(props);
+    this.inputRef = createRef();
+  }
+  getFocus = () => {
+    this.inputRef.current.focus();
+  }
+  render() {
+    return <input ref={this.inputRef}></input>
+  }
 }
-const InputForWrad = forwardRef(TextInput);
 
 class Form extends Component {
   constructor(props) {
@@ -26,13 +33,12 @@ class Form extends Component {
   }
   getInputFocus = () => {
     // this.formRef.current指向类组件的实例
-    console.log('this.textInputRef.current', this.textInputRef.current);
-    this.textInputRef.current.focus();
+    this.textInputRef.current.getFocus();
   }
   render() {
     return (
       <div>
-        <InputForWrad ref={this.textInputRef}></InputForWrad>
+        <TextInput ref={this.textInputRef}></TextInput>
         <button onClick={this.getInputFocus}>获取焦点</button>
       </div>
     )
