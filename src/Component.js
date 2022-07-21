@@ -1,3 +1,11 @@
+/*
+ * @Description: 
+ * @Author: yjy
+ * @Date: 2022-07-18 22:04:51
+ * @LastEditTime: 2022-07-22 07:53:54
+ * @LastEditors: yjy
+ * @Reference: 
+ */
 import { findDOM, compareTwoVdom } from "./react-dom";
 
 export let updateQueue = {
@@ -59,8 +67,21 @@ class Updater {
     }
 }
 function shouldUpdate(classInstance, nextProps, nextState) { 
+    let willUpdate = true; //默认更新
+    const { shouldComponentUpdate, componentWillUpdate } = classInstance;
+    //如果shouldComponentUpdate返回false则不更新
+    if (shouldComponentUpdate && !shouldComponentUpdate(nextProps, nextState)) { //
+        willUpdate = false;
+    }
+    if (willUpdate && componentWillUpdate) { 
+        componentWillUpdate();
+    } 
+    //不管组件要不要更新，state和props都要更新为最新的
+    if (nextProps) classInstance.props = nextProps;
     classInstance.state = nextState; //真正修改实例的状态
-    classInstance.forceUpdate(); //然后调用组件实例的updateComponent进行更新
+    if (willUpdate) { 
+        classInstance.forceUpdate(); //然后调用组件实例的updateComponent进行更新
+    }
 }
 
 export class Component { 
@@ -86,5 +107,8 @@ export class Component {
         let newRenderVdom = this.render();//
         compareTwoVdom(oldDOM.parentNode, oldRenderVdom, newRenderVdom);//比较差异，把更新同步到真实的dom.
         this.oldRenderVdom = newRenderVdom;
+        if (this.componentDidUpdate) { 
+            this.componentDidUpdate(this.props, this.state);
+         }
     }
 }

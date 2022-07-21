@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-07-20 23:49:52
+ * @LastEditTime: 2022-07-22 07:28:47
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -45,7 +45,11 @@ function createDOM(vdom) {
 function mountClassComponent(vdom) {
     let { type, props, ref } = vdom;
     let classInstance = new type(props);
+    //render渲染之前挂载
+    if (classInstance.componentWillMount) classInstance.componentWillMount();
     let renderDom = classInstance.render();
+    //render渲染之后挂载完成
+    if (classInstance.componentDidMount) classInstance.componentDidMount();
     //TODO
     classInstance.oldRenderVdom = vdom.oldRenderVdom = renderDom; //把老的虚拟dom挂载到实例上
     if (ref) ref.current = classInstance;
