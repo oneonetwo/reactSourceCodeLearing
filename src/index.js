@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-22 07:54:56
+ * @LastEditTime: 2022-07-23 14:56:29
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -14,6 +14,32 @@ import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
 import React, { createRef, forwardRef } from './react.js';
 
+class ChildCounter extends Component {
+	constructor(props) {
+		super(props);
+	}
+	componentWillMount() {
+		console.log('ChildCounter 1.componentWillMount');
+	}
+
+	render() {
+		console.log('childCounter 2.render');
+		return <div>{this.props.count}</div>
+	}
+	componentDidMount() {
+		console.log('childCounter 3.componentDidMount');
+	}
+	shouldComponentUpdate(nextProps,nextState) {
+		return nextProps.count % 3 === 0;//如果是3的倍数就更新，否则不更新。
+	}
+	componentWillReceiveProps() {
+		console.log('childCounter 4.componentWillReceiveProps');
+	}
+	componentWillUnmount() {
+		console.log('childCounter 5.componentWillUnmount');
+	}
+
+}
 
 class Counter extends Component {
 	constructor(props) {
@@ -32,7 +58,7 @@ class Counter extends Component {
 	shouldComponentUpdate(nextProps, nextState) {
 		console.log('couner 5.shouleComponentUpdate');
 		return nextState.number % 2 === 0;//奇数不更新，偶数个更新。
-	} 
+	}
 	componentWillUpdate() {
 		console.log('Counter 6.componentWillUpdate')
 	}
@@ -41,8 +67,9 @@ class Counter extends Component {
 	}
 	render() {
 		console.log('Counter 3. render')
-		return <div>
-			<p>{this.state.number}</p>
+		return <div id={ this.state.number }>
+			<p>Counter: {this.state.number}</p>
+			{this.state.number === 4 ? null : <ChildCounter count={this.state.number} />}
 			<button onClick={this.handleClick}> + </button>
 		</div>
 	}
