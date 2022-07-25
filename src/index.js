@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-24 13:38:42
+ * @LastEditTime: 2022-07-25 23:01:51
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -15,23 +15,33 @@ import ReactDOM from './react-dom.js';
 import React, { createRef, forwardRef } from './react.js';
 
 class ChildCounter extends Component {
+	state = {
+		count: 1
+	}
 	constructor(props) {
 		super(props);
 	}
 	componentWillMount() {
 		console.log('ChildCounter 1.componentWillMount');
 	}
-
+	//getDerivedStateFromProps是为了取代componentWillReceiveProps
+	//因为很多人再使用componentWillReceiveProps会调用this.setState经常一起死循环。
+	static getDerivedStateFromProps(nextProps, prevState) {
+		console.log('getDerivedStateFromProps');
+		const { count } = nextProps;
+		// return null;//不修改状态
+		return {...prevState, count: count*2}//新的状态对象
+	}
 	render() {
 		console.log('childCounter 2.render');
-		return <div>ChildCounter: {this.props.count}</div>
+		return <div>ChildCounter: {this.state.count}</div>
 	}
 	componentDidMount() {
 		console.log('childCounter 3.componentDidMount');
 	}
-	shouldComponentUpdate(nextProps, nextState) {
-		return nextProps.count%3 === 0;//如果是3的倍数就更新，否则不更新。
-	}
+	// shouldComponentUpdate(nextProps, nextState) {
+	// 	return nextProps.count%3 === 0;//如果是3的倍数就更新，否则不更新。
+	// }
 	componentWillReceiveProps() {
 		console.log('childCounter 4.componentWillReceiveProps');
 	}
@@ -69,7 +79,7 @@ class Counter extends Component {
 		console.log('Counter 3. render')
 		return <div id={this.state.number}>
 			<p>Counter: {this.state.number}</p>
-			{this.state.number === 4?null : <ChildCounter count={this.state.number} />}
+			<ChildCounter count={this.state.number} />
 			<button onClick={this.handleClick}> + </button>
 		</div>
 	}

@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-18 22:04:51
- * @LastEditTime: 2022-07-23 14:59:36
+ * @LastEditTime: 2022-07-25 22:52:23
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -78,7 +78,14 @@ function shouldUpdate(classInstance, nextProps, nextState) {
     } 
     //不管组件要不要更新，state和props都要更新为最新的
     if (nextProps) classInstance.props = nextProps;
-    classInstance.state = nextState; //真正修改实例的状态
+    if (classInstance.constructor.getDerivedStateFromProps) {
+        let nextState = classInstance.constructor.getDerivedStateFromProps(nextProps, classInstance.state);
+        if (nextState) {
+            classInstance.state = nextState;
+        }
+    } else { 
+        classInstance.state = nextState; //真正修改实例的状态
+    }
     if (willUpdate) { 
         classInstance.forceUpdate(); //然后调用组件实例的updateComponent进行更新
     }
