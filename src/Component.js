@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-18 22:04:51
- * @LastEditTime: 2022-07-25 22:52:23
+ * @LastEditTime: 2022-07-26 07:58:48
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -112,10 +112,14 @@ export class Component {
         let oldRenderVdom = this.oldRenderVdom; //老的虚拟dom
         let oldDOM = findDOM(oldRenderVdom);//根据老的虚拟dom，找到老地真实dom;
         let newRenderVdom = this.render();//
+        let extraArgs;
+        if (this.getSnapshotBeforeUpdate) {
+            extraArgs = this.getSnapshotBeforeUpdate();
+        }
         compareTwoVdom(oldDOM.parentNode, oldRenderVdom, newRenderVdom);//比较差异，把更新同步到真实的dom.
         this.oldRenderVdom = newRenderVdom;
         if (this.componentDidUpdate) { 
-            this.componentDidUpdate(this.props, this.state);
+            this.componentDidUpdate(this.props, this.state, extraArgs);//snapshot的返回值作为第三个参数
          }
     }
 }

@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-07-24 14:14:55
+ * @LastEditTime: 2022-07-26 08:26:58
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -68,7 +68,7 @@ function mountClassComponent(vdom) {
     let dom = createDOM(renderVdom);
     //render渲染之后挂载完成
     if (classInstance.componentDidMount) { 
-        dom.componentDidMount = classInstance.componentDidMount.bind(this);
+        dom.componentDidMount = classInstance.componentDidMount.bind(classInstance);
     }
     return dom;
     
@@ -80,7 +80,7 @@ function mountFunctionComponent(vdom) {
     vdom.oldRenderVdom = renderDom;
     return createDOM(renderDom);
 }
-function reconcileChildren (childVdom, parentDOM){
+function reconcileChildren(childVdom, parentDOM) {
     childVdom.forEach(child => { 
         render(child, parentDOM);
     })

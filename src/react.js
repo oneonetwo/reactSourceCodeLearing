@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-07-23 21:07:01
+ * @LastEditTime: 2022-07-26 08:25:49
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -19,7 +19,7 @@ export function createElement(type, props, ...children) {
          key: key, //区分父亲的不同儿子
          props: {
              ...resProps,
-             children: children.map(child => {
+             children: [].concat(...children).map(child => {
                  return typeof child === 'object'
                      ? child
                      : wrapToVdom(child);
