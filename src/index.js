@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-26 08:28:20
+ * @LastEditTime: 2022-07-27 00:03:30
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -12,61 +12,72 @@
 
 import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
-import React, { createRef, forwardRef } from './react.js';
+import React from './react.js';
 
-class ScrollList extends Component { 
-	constructor(props) {
-		super(props);
-		this.state = { messages: [] };
-		this.wrapper = React.createRef();
-	}
-	addMessage = () => {
-		this.setState(state => ({
-			messages: [state.messages.length, ...state.messages]
-		}));
-	}
-	componentDidMount() {
-		this.timer = setInterval(() => {
-			this.addMessage();
-		}, 1000);
-	}
-	componentWillUnmount() {
-		clearInterval(this.timer);
-	}
-	getSnapshotBeforeUpdate() {
-		return {
-			prevScrollTop: this.wrapper.current.scrollTop,//更新前向上卷去的高度 50
-			prevScrollHeight: this.wrapper.current.scrollHeight//更新内容的高度 200
-		}
-	}
-	componentDidUpdate(prevProps, prevState, { prevScrollTop, prevScrollHeight }) {
-		this.wrapper.current.scrollTop = prevScrollTop + (this.wrapper.current.scrollHeight - prevScrollHeight);
-	}
+let ThemeContext = React.createContext();
+let { Provider, Consumer } = ThemeContext;
 
+class Content extends Component {
+	static contextType = ThemeContext;
 	render() {
-		let style = {
-			height: '100px',
-			width: '200px',
-			border: '1px solid red',
-			overflow: 'auto'
-		}
-		return (
-			<div style={style} ref={this.wrapper}>
-				{
-					this.state.messages.map((message, index) => {
-						return <div key={index}>{message}</div>
-					})
-				}
-			</div>
-		)
+		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+			内容
+			<button onClick={() => this.context.changeColor('red')}>变红</button>
+			<button onClick={() => this.context.changeColor('green')}>变绿</button>
+		</div>
+	}
+}
+class Main extends Component {
+	static contextType = ThemeContext;
+	render() {
+		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+			主体
+			<Content></Content>
+		</div>
+	}
+}
+class Title extends Component {
+	static contextType = ThemeContext;
+	render() {
+		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+			标题
+		</div>
 	}
 }
 
-ReactDOM.render(<ScrollList />, document.getElementById('root'));
+class Header extends Component { 
+	static contextType = ThemeContext;
+	render() { 
+		console.log('this.context', ThemeContext);
+		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+				头部
+				<Title></Title>
+			</div>
+	}
+}
 
-// const root = ReactDOM.createRoot(document.getElementById('root'));
 
-// root.render(
-//   element1
-// );
+
+class Page extends Component { 
+	constructor(props) { 
+		super(props);
+		this.state = { color: 'red' };
+	}
+	changeColor = (color) => { 
+		this.setState({ color });
+	}
+	render() { 
+		let value = {color: this.state.color, changeColor: this.changeColor}
+		return <Provider value={ value }>
+			<div style={{ margin: '10px', border: `5px solid ${this.state.color}`, padding: '5px', width: '200px' }}>
+				主页
+				<Header></Header>
+				<Main></Main>
+			</div>
+		</Provider>
+	}
+}
+
+
+ReactDOM.render(<Page/>, document.getElementById('root'));
 

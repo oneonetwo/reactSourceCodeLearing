@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-07-26 08:25:49
+ * @LastEditTime: 2022-07-26 23:58:27
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -45,8 +45,23 @@ export function forwardRef(render) {
     }
 }
 
+export function createContext() {
+    let context = {};
+    function Provider({ value, children}) { 
+        context._value = value;
+        return children[0];
+    }
+    function Consumber() { 
+        
+    }
+    context.Provider = Provider;
+    context.Consumber = Consumber;
+    return context;
+}
+
 const React = {
     createElement,
+    createContext,
     Component,
     createRef,
     forwardRef
