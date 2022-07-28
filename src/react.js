@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-07-27 22:33:08
+ * @LastEditTime: 2022-07-29 00:21:46
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -58,9 +58,28 @@ export function createContext() {
     context.Consumber = Consumber;
     return context;
 }
+/**
+ * 根据一个老的react元素克隆出一个新的元素
+ * @param {*} oldElement 老元素
+ * @param {*} newProps 新属性
+ * @param {*} children 新的儿子
+ */
+export function cloneElement(oldElement, newProps, ...oldChildren) { 
+    //处理下children
+    let children = oldChildren.map(child => {
+        return typeof child === 'object' ?
+            child :
+            wrapToVdom(child);
+    })
+    //属性覆盖
+    let props = { ...oldElement.props, ...newProps, children };
+    //合并虚拟dom
+    return {...oldElement, props}
+} 
 
 const React = {
     createElement,
+    cloneElement,
     createContext,
     Component,
     createRef,

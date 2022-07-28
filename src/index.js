@@ -2,44 +2,59 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-28 22:58:59
+ * @LastEditTime: 2022-07-29 00:08:27
  * @LastEditors: yjy
  * @Reference: 
  */
-// import React from 'react';
+// import React, { Component } from 'react';
 // import ReactDOM from 'react-dom';
 
 
 import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
 import React from './react.js';
-
-const withLoading = (OldComponent) => {
-	return class extends React.Component {
-		show = () => {
-			let loading = document.createElement('div');
-			loading.id = 'loading';
-			loading.innerHTML = `<p style="width: 100px;height:100px;">loading<p>`;
-			document.body.appendChild(loading);
-		}
-		hide = () => {
-			document.getElementById('loading').remove();
-		}
-		render() {
-			return <OldComponent {...this.props} show={this.show} hide={this.hide}></OldComponent>
-		}
+//基于反向继承：拦截生命周期 state 渲染过程
+//假如我们有一个第三方的组件库
+class Button extends Component { 
+	state = { name: '张三' }
+	componentWillMount(){ 
+		console.log('Button componentWillMount');
+	}	
+	componentDidMount() { 
+		console.log('Button componentDidMount');
 	}
-}
-
-class Panel extends Component {
 	render() {
-		return <div>
-			<button onClick={this.props.show}> 显示 </button>
-			<button onClick={this.props.hide}> 隐藏 </button>
-		</div>
+		console.log('Button render');
+		return <button name={this.state.name}> { this.props.title }</button>
 	}
 }
 
-let LoadingPanel = withLoading(Panel);
-ReactDOM.render(<LoadingPanel />, document.getElementById('root'));
+const wrapper = oldComponent => { 
+	return class extends oldComponent {
+		state = { number: 0 };
+		componentWillMount() { 
+			console.log('wrapper componentWillMount');
+			super.componentWillMount();
+		}
+		componentDidMount() { 
+			console.log('wrapper componentDidMount');
+			super.componentDidMount();
+		}
+		handleClick = () => { 
+			this.setState({ number: this.state.number + 1 });
+		}
+		render() { 
+			let element = super.render();
+			let cloneElement = React.cloneElement(element, {
+				...super.props,
+				onClick: this.handleClick,
+			}, this.state.number);
+			return cloneElement;
+		}
+	}
+}
+
+const WrapperComponent = wrapper(Button); 
+
+ReactDOM.render(<WrapperComponent />, document.getElementById('root'));
 

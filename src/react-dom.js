@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-07-27 00:11:28
+ * @LastEditTime: 2022-07-29 00:21:13
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -19,6 +19,7 @@ export function render(vdom, container) {
  * 把虚拟dom转成真实的dom 
  */
 function createDOM(vdom) { 
+    console.log('vdom', vdom);
     let { type, props, ref, key } = vdom;
     let dom;
     // forwardsref类型
