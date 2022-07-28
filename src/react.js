@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-07-26 23:58:27
+ * @LastEditTime: 2022-07-27 22:33:08
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -51,8 +51,8 @@ export function createContext() {
         context._value = value;
         return children[0];
     }
-    function Consumber() { 
-        
+    function Consumber({children}) { 
+        return children[0](context._value);
     }
     context.Provider = Provider;
     context.Consumber = Consumber;

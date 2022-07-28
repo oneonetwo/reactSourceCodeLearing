@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-27 00:03:30
+ * @LastEditTime: 2022-07-28 22:58:59
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -14,70 +14,32 @@ import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
 import React from './react.js';
 
-let ThemeContext = React.createContext();
-let { Provider, Consumer } = ThemeContext;
+const withLoading = (OldComponent) => {
+	return class extends React.Component {
+		show = () => {
+			let loading = document.createElement('div');
+			loading.id = 'loading';
+			loading.innerHTML = `<p style="width: 100px;height:100px;">loading<p>`;
+			document.body.appendChild(loading);
+		}
+		hide = () => {
+			document.getElementById('loading').remove();
+		}
+		render() {
+			return <OldComponent {...this.props} show={this.show} hide={this.hide}></OldComponent>
+		}
+	}
+}
 
-class Content extends Component {
-	static contextType = ThemeContext;
+class Panel extends Component {
 	render() {
-		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-			内容
-			<button onClick={() => this.context.changeColor('red')}>变红</button>
-			<button onClick={() => this.context.changeColor('green')}>变绿</button>
-		</div>
-	}
-}
-class Main extends Component {
-	static contextType = ThemeContext;
-	render() {
-		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-			主体
-			<Content></Content>
-		</div>
-	}
-}
-class Title extends Component {
-	static contextType = ThemeContext;
-	render() {
-		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-			标题
+		return <div>
+			<button onClick={this.props.show}> 显示 </button>
+			<button onClick={this.props.hide}> 隐藏 </button>
 		</div>
 	}
 }
 
-class Header extends Component { 
-	static contextType = ThemeContext;
-	render() { 
-		console.log('this.context', ThemeContext);
-		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-				头部
-				<Title></Title>
-			</div>
-	}
-}
-
-
-
-class Page extends Component { 
-	constructor(props) { 
-		super(props);
-		this.state = { color: 'red' };
-	}
-	changeColor = (color) => { 
-		this.setState({ color });
-	}
-	render() { 
-		let value = {color: this.state.color, changeColor: this.changeColor}
-		return <Provider value={ value }>
-			<div style={{ margin: '10px', border: `5px solid ${this.state.color}`, padding: '5px', width: '200px' }}>
-				主页
-				<Header></Header>
-				<Main></Main>
-			</div>
-		</Provider>
-	}
-}
-
-
-ReactDOM.render(<Page/>, document.getElementById('root'));
+let LoadingPanel = withLoading(Panel);
+ReactDOM.render(<LoadingPanel />, document.getElementById('root'));
 
