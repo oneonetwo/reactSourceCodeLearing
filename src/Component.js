@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-18 22:04:51
- * @LastEditTime: 2022-07-27 00:02:11
+ * @LastEditTime: 2022-08-02 08:15:37
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -113,7 +113,7 @@ export class Component {
         let oldDOM = findDOM(oldRenderVdom);//根据老的虚拟dom，找到老地真实dom;
         //给类组件的contextType赋值。
         if (this.constructor.contextType) {
-            this.context = this.constructor.contextType._value;
+            this.context = this.constructor.contextType._currentValue;
         }
         let newRenderVdom = this.render();//
         let extraArgs;

@@ -2,59 +2,91 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-29 00:08:27
+ * @LastEditTime: 2022-08-02 08:10:41
  * @LastEditors: yjy
  * @Reference: 
  */
-// import React, { Component } from 'react';
+// import React from 'react';
 // import ReactDOM from 'react-dom';
 
 
 import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
 import React from './react.js';
-//基于反向继承：拦截生命周期 state 渲染过程
-//假如我们有一个第三方的组件库
-class Button extends Component { 
-	state = { name: '张三' }
-	componentWillMount(){ 
-		console.log('Button componentWillMount');
-	}	
-	componentDidMount() { 
-		console.log('Button componentDidMount');
+
+let ThemeContext = React.createContext();
+let { Provider, Consumer } = ThemeContext;
+
+class Content extends Component {
+	static contextType = ThemeContext;
+	render() {
+		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+			内容
+			<button onClick={() => this.context.changeColor('red')}>变红</button>
+			<button onClick={() => this.context.changeColor('green')}>变绿</button>
+		</div>
+	}
+}
+class Main extends Component {
+	static contextType = ThemeContext;
+	render() {
+		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+			主体
+			<Content></Content>
+		</div>
+	}
+}
+class Title extends Component {
+	static contextType = ThemeContext;
+	render() {
+		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+			标题
+		</div>
+	}
+}
+
+// class Header extends Component { 
+// 	static contextType = ThemeContext;
+// 	render() { 
+// 		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
+// 				头部
+// 				<Title></Title>
+// 			</div>
+// 	}
+// }
+
+function Header() {
+	return <Consumer>
+		{
+			value => <div style={{ margin: '10px', border: `5px solid ${value.color}`, padding: '5px', width: '200px' }}>
+				头部
+				<Title></Title>
+			</div>
+		}
+	</Consumer>
+}
+
+
+class Page extends Component {
+	constructor(props) {
+		super(props);
+		this.state = { color: 'red' };
+	}
+	changeColor = (color) => {
+		this.setState({ color });
 	}
 	render() {
-		console.log('Button render');
-		return <button name={this.state.name}> { this.props.title }</button>
+		let value = { color: this.state.color, changeColor: this.changeColor }
+		return <Provider value={value}>
+			<div style={{ margin: '10px', border: `5px solid ${this.state.color}`, padding: '5px', width: '200px' }}>
+				主页
+				<Header></Header>
+				<Main></Main>
+			</div>
+		</Provider>
 	}
 }
 
-const wrapper = oldComponent => { 
-	return class extends oldComponent {
-		state = { number: 0 };
-		componentWillMount() { 
-			console.log('wrapper componentWillMount');
-			super.componentWillMount();
-		}
-		componentDidMount() { 
-			console.log('wrapper componentDidMount');
-			super.componentDidMount();
-		}
-		handleClick = () => { 
-			this.setState({ number: this.state.number + 1 });
-		}
-		render() { 
-			let element = super.render();
-			let cloneElement = React.cloneElement(element, {
-				...super.props,
-				onClick: this.handleClick,
-			}, this.state.number);
-			return cloneElement;
-		}
-	}
-}
 
-const WrapperComponent = wrapper(Button); 
-
-ReactDOM.render(<WrapperComponent />, document.getElementById('root'));
+ReactDOM.render(<Page />, document.getElementById('root'));
 
