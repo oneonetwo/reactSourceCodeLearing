@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-07-27 22:36:15
+ * @LastEditTime: 2022-08-03 23:22:45
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -56,14 +56,14 @@ class Title extends Component {
 // }
 
 function Header() {
-	return <ThemeContext.Consumber>
+	return <ThemeContext.Consumer>
 		{
 			value => <div style={{ margin: '10px', border: `5px solid ${value.color}`, padding: '5px', width: '200px' }}>
 				头部
 				<Title></Title>
 			</div>
 		}
-	</ThemeContext.Consumber>
+	</ThemeContext.Consumer>
 }
 
 

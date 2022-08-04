@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-08-02 08:10:41
+ * @LastEditTime: 2022-08-04 08:20:56
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -10,83 +10,73 @@
 // import ReactDOM from 'react-dom';
 
 
+
 import { Component } from './Component.js';
 import ReactDOM from './react-dom.js';
 import React from './react.js';
 
-let ThemeContext = React.createContext();
-let { Provider, Consumer } = ThemeContext;
-
-class Content extends Component {
-	static contextType = ThemeContext;
-	render() {
-		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-			内容
-			<button onClick={() => this.context.changeColor('red')}>变红</button>
-			<button onClick={() => this.context.changeColor('green')}>变绿</button>
-		</div>
+class MouseTracker extends React.Component {
+	state = {
+		x: 0,
+		y: 0
+	}
+	handleMove = (event) => {
+		this.setState({
+			x: event.clientX,
+			y: event.clientY
+		})
+	}
+	render() { 
+		return <div onMouseMove={this.handleMove}>
+			{/* { this.props.children[0](this.state) } */}
+			{ this.props.render(this.state)}
+		</div>	
 	}
 }
-class Main extends Component {
-	static contextType = ThemeContext;
-	render() {
-		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-			主体
-			<Content></Content>
+const Welcome = props => { 
+	return <div>
+			<h1>移动鼠标</h1>
+			<p>当前鼠标的位置：x={props.x}, y={props.y}</p>
+			<h2>口号：{ props.ss}</h2>	
 		</div>
-	}
 }
-class Title extends Component {
-	static contextType = ThemeContext;
-	render() {
-		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-			标题
-		</div>
+function withTracker(OldComponent) { 
+	return class extends Component { 
+		state = {
+		x: 0,
+		y: 0
 	}
+	handleMove = (event) => {
+		this.setState({
+			x: event.clientX,
+			y: event.clientY
+		})
+	}
+	render() { 
+		return <div onMouseMove={this.handleMove}>
+			<OldComponent {...this.state} {...this.props} /> 
+		</div>	
+	}
+	} 
 }
-
-// class Header extends Component { 
-// 	static contextType = ThemeContext;
-// 	render() { 
-// 		return <div style={{ margin: '10px', border: `5px solid ${this.context.color}`, padding: '5px', width: '200px' }}>
-// 				头部
-// 				<Title></Title>
-// 			</div>
+// 1.children 的写法  是个函数
+// ReactDOM.render(<MouseTracker>
+// 	{
+// 		(props) => <div>
+// 			<h1>移动鼠标</h1>
+// 			<p>当前鼠标的位置：x={props.x}, y={props.y}</p>
+// 		</div>
 // 	}
-// }
+// </MouseTracker>, document.getElementById('root'));
+// 2. renderProps的写法
+// ReactDOM.render(<MouseTracker render={
+// 		(props) => <div>
+// 			<h1>移动鼠标</h1>
+// 			<p>当前鼠标的位置：x={props.x}, y={props.y}</p>
+// 		</div>
+// 	} />, document.getElementById('root'));
+//3.高阶函数的写法
+let Tracker = withTracker(Welcome);
+ReactDOM.render(<Tracker ss={ '长江后浪退前浪，一浪更比一辆强' } />, document.getElementById('root'));
 
-function Header() {
-	return <Consumer>
-		{
-			value => <div style={{ margin: '10px', border: `5px solid ${value.color}`, padding: '5px', width: '200px' }}>
-				头部
-				<Title></Title>
-			</div>
-		}
-	</Consumer>
-}
-
-
-class Page extends Component {
-	constructor(props) {
-		super(props);
-		this.state = { color: 'red' };
-	}
-	changeColor = (color) => {
-		this.setState({ color });
-	}
-	render() {
-		let value = { color: this.state.color, changeColor: this.changeColor }
-		return <Provider value={value}>
-			<div style={{ margin: '10px', border: `5px solid ${this.state.color}`, padding: '5px', width: '200px' }}>
-				主页
-				<Header></Header>
-				<Main></Main>
-			</div>
-		</Provider>
-	}
-}
-
-
-ReactDOM.render(<Page />, document.getElementById('root'));
 
