@@ -2,30 +2,43 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-08-03 08:05:39
+ * @LastEditTime: 2022-08-10 22:47:49
  * @LastEditors: yjy
  * @Reference: 
  */
 import { wrapToVdom } from "./utils";
-import { Component }  from "./Component.js";
+import { Component, PureComponent }  from "./Component.js";
 import { REACT_CONTEXT, REACT_FORWARDS_REF_TYPE, REACT_PROVIDER } from "./constants";
 
 
-export function createElement(type, props, ...children) {
-    let { ref, key,  ...resProps } = props;
+function createElement(type, config, children) {
+    let ref; //是用来获取虚拟DOM实例的
+    let key; //用来区分同一个父亲的不同儿子的
+    if (config) {
+        delete config.__source;
+        delete config.__self;
+        ref = config.ref;
+        delete config.ref;
+        key = config.key;
+        delete config.key;
+    }
+    let props = {
+        ...config
+    }; //没有ref和key
+    if (arguments.length > 3) { //如果参数大于3个，说明有多个儿子
+        //核心就是把字符串或者说数字类型的节点转换成对象的形式
+        props.children = Array.prototype.slice.call(arguments, 2).map(wrapToVdom);
+    } else {
+        if (typeof children !== 'undefined')
+            props.children = wrapToVdom(children);
+        //children可能是一个字符串，也可能是一个数字，也可能是个null undefined,也可能是一个数组
+    }
     return {
-         type,
-         ref: ref, //获取虚拟dom实例
-         key: key, //区分父亲的不同儿子
-         props: {
-             ...resProps,
-             children: [].concat(...children).map(child => {
-                 return typeof child === 'object'
-                     ? child
-                     : wrapToVdom(child);
-             })
-         }
-     }
+        type,
+        props,
+        ref,
+        key
+    }
 }
 export function createRef() { 
     return {current: null}
@@ -70,13 +83,13 @@ function createContext(){
  * @param {*} newProps 新属性
  * @param {*} children 新的儿子
  */
-export function cloneElement(oldElement, newProps, ...oldChildren) { 
+export function cloneElement(oldElement, newProps, children) {
     //处理下children
-    let children = oldChildren.map(child => {
-        return typeof child === 'object' ?
-            child :
-            wrapToVdom(child);
-    })
+    if (arguments.length > 3) {
+        children = Array.prototype.slice.call(arguments, 2).map(wrapToVdom);
+    } else {
+        children = wrapToVdom(children);
+    }
     //属性覆盖
     let props = { ...oldElement.props, ...newProps, children };
     //合并虚拟dom
@@ -88,6 +101,7 @@ const React = {
     cloneElement,
     createContext,
     Component,
+    PureComponent,
     createRef,
     forwardRef
 }

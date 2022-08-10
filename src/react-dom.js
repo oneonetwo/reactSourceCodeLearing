@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-08-03 23:19:34
+ * @LastEditTime: 2022-08-10 22:45:40
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -40,10 +40,12 @@ function createDOM(vdom) {
         dom = document.createElement(type);
     }
     if (props) { 
-        updateProps(dom, {}, props);
-        if (props.children) {
-            reconcileChildren(props.children, dom);
-        }
+         updateProps(dom, {}, props); //根据虚拟DOM中的属性更新真实DOM属性
+         if (typeof props.children == 'object' && props.children.type) { //它是个对象 只有一个儿子
+             render(props.children, dom);
+         } else if (Array.isArray(props.children)) { //如果是一个数组
+             reconcileChildren(props.children, dom);
+         }
     }
     //dom属性挂载真实的dom;
     vdom.dom = dom;
@@ -107,10 +109,11 @@ function mountFunctionComponent(vdom) {
     vdom.oldRenderVdom = renderDom;
     return createDOM(renderDom);
 }
-function reconcileChildren(childVdom, parentDOM) {
-    childVdom.forEach(child => { 
-        render(child, parentDOM);
-    })
+function reconcileChildren(childrenVdom, parentDOM) {
+    for (let i = 0; i < childrenVdom.length; i++) {
+        let childVdom = childrenVdom[i];
+        render(childVdom, parentDOM);
+    }
 }
 /**
  * 更新dom的props 
@@ -238,7 +241,7 @@ function updateProviderComponent(oldVdom, newVdom) {
     let parentDOM = findDOM(oldVdom).parentNode;
     let { type, props } = newVdom;
     type._context._currentValue = props.value;
-    let renderVdom = props.children[0];
+    let renderVdom = props.children;
     compareTwoVdom(parentDOM, oldVdom.oldRenderVdom, renderVdom);
     newVdom.oldRenderVdom = renderVdom;
 }
@@ -246,7 +249,7 @@ function updateProviderComponent(oldVdom, newVdom) {
 function updateContextComponent(oldVdom, newVdom) {
     let parentDOM = findDOM(oldVdom).parentNode;
     let { type, props } = newVdom;
-    let renderVdom = props.children[0](type._context._currentValue);
+    let renderVdom = props.children(type._context._currentValue);
     compareTwoVdom(parentDOM, oldVdom.oldRenderVdom, renderVdom);
     newVdom.oldRenderVdom = renderVdom;
 }
@@ -259,11 +262,13 @@ function updateFunctionComponent(oldVdom, newVdom) {
 }
 
 function updateChildren(parentDOM, oldVChildren, newVChildren) { 
+    oldVChildren = Array.isArray(oldVChildren) ? oldVChildren : [oldVChildren];
+    newVChildren = Array.isArray(newVChildren) ? newVChildren : [newVChildren];
     let maxLength = Math.max(oldVChildren.length, newVChildren.length);
-    for (let i = 0; i < maxLength; i++) { 
+    for (let i = 0; i < maxLength; i++) {
         //找当前的虚拟DOM节点这后的最近的一个真实DOM节点
-        let nextVnode = oldVChildren.find((item, index) => index > i && item && findDOM(item));
-        compareTwoVdom(parentDOM, oldVChildren[i], newVChildren[i], nextVnode&&findDOM(nextVnode));
+        let nextVNode = oldVChildren.find((item, index) => index > i && item && findDOM(item));
+        compareTwoVdom(parentDOM, oldVChildren[i], newVChildren[i], nextVNode && findDOM(nextVNode));
     }
 }
 const ReactDOM = {

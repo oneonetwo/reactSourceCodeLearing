@@ -2,11 +2,12 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-18 22:04:51
- * @LastEditTime: 2022-08-02 08:15:37
+ * @LastEditTime: 2022-08-10 22:36:51
  * @LastEditors: yjy
  * @Reference: 
  */
 import { findDOM, compareTwoVdom } from "./react-dom";
+import { shallowEqual } from "./utils";
 
 export let updateQueue = {
     isBatchingUpdate: false, //通过此变量来控制变量更新
@@ -68,13 +69,12 @@ class Updater {
 }
 function shouldUpdate(classInstance, nextProps, nextState) { 
     let willUpdate = true; //默认更新
-    const { shouldComponentUpdate, componentWillUpdate } = classInstance;
     //如果shouldComponentUpdate返回false则不更新
-    if (shouldComponentUpdate && !shouldComponentUpdate(nextProps, nextState)) { //
+    if (classInstance.shouldComponentUpdate && !classInstance.shouldComponentUpdate(nextProps, nextState)) { //
         willUpdate = false;
     }
-    if (willUpdate && componentWillUpdate) { 
-        componentWillUpdate();
+    if (willUpdate && classInstance.componentWillUpdate) {
+        classInstance.componentWillUpdate();
     } 
     //不管组件要不要更新，state和props都要更新为最新的
     if (nextProps) classInstance.props = nextProps;
@@ -125,5 +125,11 @@ export class Component {
         if (this.componentDidUpdate) { 
             this.componentDidUpdate(this.props, this.state, extraArgs);//snapshot的返回值作为第三个参数
          }
+    }
+}
+
+export class PureComponent extends Component{
+    shouldComponentUpdate(nextProps, nextState) {
+        return !shallowEqual(this.props, nextProps) || !shallowEqual(this.state, nextState);
     }
 }
