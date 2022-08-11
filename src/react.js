@@ -2,13 +2,13 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-08-10 22:47:49
+ * @LastEditTime: 2022-08-11 08:16:56
  * @LastEditors: yjy
  * @Reference: 
  */
-import { wrapToVdom } from "./utils";
+import { shallowEqual, wrapToVdom } from "./utils";
 import { Component, PureComponent }  from "./Component.js";
-import { REACT_CONTEXT, REACT_FORWARDS_REF_TYPE, REACT_PROVIDER } from "./constants";
+import { REACT_CONTEXT, REACT_FORWARDS_REF_TYPE, REACT_MEMO, REACT_PROVIDER } from "./constants";
 
 
 function createElement(type, config, children) {
@@ -95,7 +95,18 @@ export function cloneElement(oldElement, newProps, children) {
     //合并虚拟dom
     return {...oldElement, props}
 } 
-
+/**
+ * 
+ * @param {*} type  函数组件 
+ * @param {*} compare 默认是浅比较
+ */
+export function memo(type, compare=shallowEqual) { 
+    return {
+        $$typeof: REACT_MEMO,
+        type,
+        compare
+    }
+}
 const React = {
     createElement,
     cloneElement,
@@ -103,7 +114,8 @@ const React = {
     Component,
     PureComponent,
     createRef,
-    forwardRef
+    forwardRef,
+    memo
 }
 
 export default React;

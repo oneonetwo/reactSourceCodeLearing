@@ -2,11 +2,11 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-08-10 22:45:40
+ * @LastEditTime: 2022-08-11 08:34:26
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
-import { REACT_CONTEXT, REACT_FORWARDS_REF_TYPE, REACT_PROVIDER, REACT_TEXT } from "./constants";
+import { REACT_CONTEXT, REACT_FORWARDS_REF_TYPE, REACT_MEMO, REACT_PROVIDER, REACT_TEXT } from "./constants";
 import { addEvent } from './events';
 
 //把虚拟dom转成真实dom插入到容器中
@@ -21,7 +21,9 @@ export function render(vdom, container) {
 function createDOM(vdom) { 
     let { type, props, ref, key } = vdom;
     let dom;
-    if (type && type.$$typeof === REACT_PROVIDER) {
+    if (type && type.$$typeof === REACT_MEMO) { 
+        return mountMemoComponent(vdom);
+    }else if (type && type.$$typeof === REACT_PROVIDER) {
         return mountProviderComponent(vdom);
     } else if (type && type.$$typeof === REACT_CONTEXT) {
         return mountContextComponent(vdom);
@@ -52,11 +54,19 @@ function createDOM(vdom) {
     if(ref) ref.current = dom;
     return dom;
 }
+//对memo的处理
+function mountMemoComponent(vdom) {
+    let { type, props } = vdom;
+    let renderVdom = type.type(props);
+    vdom.prevProps = props; //记录下老的属性对象，再更新的时候会用到。
+    vdom.oldRenderVdom = renderVdom;
+    return createDOM(renderVdom);
+}
 
 //context的处理
 function mountContextComponent(vdom) { 
     let { type, props } = vdom;
-    let renderVdom = props.children[0](type._context._currentValue);
+    let renderVdom = props.children(type._context._currentValue);
     vdom.oldRenderVdom = renderVdom;
     return createDOM(renderVdom);
 }
@@ -66,7 +76,7 @@ function mountProviderComponent(vdom) {
     let { type, props } = vdom;
     //在渲染Provider组件的时候，拿到属性中的value，赋给context._currentValue
     type._context._currentValue = props.value;
-    let renderVdom = props.children[0];
+    let renderVdom = props.children;
     vdom.oldRenderVdom = renderVdom;
     return createDOM(renderVdom);
 
@@ -197,7 +207,9 @@ export function compareTwoVdom(parentDOM, oldVdom, newVdom, nextDOM) {
 }
 
 function updateElement(oldVdom, newVdom) {
-    if (oldVdom.type && oldVdom.type.$$typeof === REACT_PROVIDER) {
+    if (oldVdom.type && oldVdom.type.$$typeof === REACT_MEMO) { 
+        updateMemoComponent(oldVdom, newVdom);
+    }else if (oldVdom.type && oldVdom.type.$$typeof === REACT_PROVIDER) {
         updateProviderComponent(oldVdom, newVdom);
     } else if (oldVdom.type && oldVdom.type.$$typeof === REACT_CONTEXT) {
         updateContextComponent(oldVdom, newVdom);
@@ -224,6 +236,20 @@ function updateElement(oldVdom, newVdom) {
             //函数组件
             updateFunctionComponent(oldVdom, newVdom);
         }
+    }
+}
+function updateMemoComponent(oldVdom, newVdom) { 
+    let { type, props } = oldVdom;
+    if (type.compare(props, newVdom.props)) {
+        newVdom.oldRenderVdom = oldVdom.oldRenderVdom;
+        newVdom.prevProps = oldVdom.props;
+    } else { 
+        let parentDOM = findDOM(oldVdom).parentNode;
+        let { type, props } = newVdom;
+        let renderVdom = type.type(props);
+        compareTwoVdom(parentDOM, oldVdom.oldRenderVdom, renderVdom);
+        newVdom.prevProps=newVdom.props;
+        newVdom.oldRenderVdom = renderVdom;
     }
 }
 
