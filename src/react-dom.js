@@ -2,18 +2,44 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-08-11 08:34:26
+ * @LastEditTime: 2022-08-16 08:40:34
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
 import { REACT_CONTEXT, REACT_FORWARDS_REF_TYPE, REACT_MEMO, REACT_PROVIDER, REACT_TEXT } from "./constants";
 import { addEvent } from './events';
 
+let hookState = []; //存放所有的状态
+let hookIndex = 0; //当前执行的hook的索引
+let scheduleUpdate; //调度更新的方法
+
 //把虚拟dom转成真实dom插入到容器中
 export function render(vdom, container) { 
-    let newDOM = createDOM(vdom);
-    container.appendChild(newDOM);
-    if (newDOM.componentDidMount) newDOM.componentDidMount();
+    mount(vdom, container);
+    scheduleUpdate = () => { 
+        console.log('开始更新');
+        hookIndex = 0;
+        compareTwoVdom(container, vdom, vdom);
+    }
+}
+//
+function mount(vdom, container) { 
+     let newDOM = createDOM(vdom);
+     container.appendChild(newDOM);
+     if (newDOM.componentDidMount) newDOM.componentDidMount();
+}
+
+export function useState(initialState) { 
+    if (!hookState[hookIndex]) { 
+        hookState[hookIndex] = hookState[hookIndex] || initialState;
+    }
+    let currentIndex = hookIndex;
+    function setState(newState) { 
+        hookState[currentIndex] = newState; 
+        //调用更新
+        scheduleUpdate();
+    }
+    return [hookState[hookIndex++], setState]
 }
 /**
  * 把虚拟dom转成真实的dom 
