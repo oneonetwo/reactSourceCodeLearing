@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-08-16 08:40:34
+ * @LastEditTime: 2022-08-16 22:29:22
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -17,7 +17,6 @@ let scheduleUpdate; //调度更新的方法
 export function render(vdom, container) { 
     mount(vdom, container);
     scheduleUpdate = () => { 
-        console.log('开始更新');
         hookIndex = 0;
         compareTwoVdom(container, vdom, vdom);
     }

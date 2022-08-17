@@ -2,31 +2,35 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-08-16 08:37:29
+ * @LastEditTime: 2022-08-16 22:40:24
  * @LastEditors: yjy
  * @Reference: 
  */
-// import React from 'react';
-// import ReactDOM from 'react-dom';
+import React from 'react';
+import ReactDOM from 'react-dom';
+// import ReactDOM from './react-dom.js';
+// import React from './react.js';
 
-
-
-import { Component } from './Component.js';
-import ReactDOM from './react-dom.js';
-import React from './react.js';
-
-function Counter(props) { 
+function Counter({ data, handleClick}) { 
+    console.log('Counter render')
+    return <button onClick={handleClick}>{ data.number }</button>
+}
+let MemoCounter = React.memo(Counter);
+function App() { 
+    let [name, setName] = React.useState('jingyuan');
     let [number, setNumber] = React.useState(0);
-    let handleClick = () => { 
+    let handleClick = React.useCallback(() => {
         setNumber(number + 1);
-    }
-    return (<div>
-        <div>{ number }</div>
-        <button onClick={handleClick}> + </button>
-    </div>)
+    }, [number])
+    let data = React.useMemo(() => ({ number }), [number]);
+    console.log('App render')
+    return <div>
+        <input type={'text'} value={name} onChange={e => setName(e.target.value)} />
+        <MemoCounter data={data} handleClick={ handleClick} />
+    </div>
 }
 
-ReactDOM.render(<Counter />, document.getElementById('root'));
+ReactDOM.render(<App/> , document.getElementById('root'));
 
 
 
