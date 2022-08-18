@@ -2,14 +2,14 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-08-16 08:35:47
+ * @LastEditTime: 2022-08-18 22:29:29
  * @LastEditors: yjy
  * @Reference: 
  */
 import { shallowEqual, wrapToVdom } from "./utils";
 import { Component, PureComponent }  from "./Component.js";
 import { REACT_CONTEXT, REACT_FORWARDS_REF_TYPE, REACT_MEMO, REACT_PROVIDER } from "./constants";
-import { useState } from "./react-dom";
+import { useCallback, useMemo, useState } from "./react-dom";
 
 
 function createElement(type, config, children) {
@@ -117,7 +117,9 @@ const React = {
     createRef,
     forwardRef,
     memo,
-    useState
+    useState,
+    useMemo,
+    useCallback
 }
 
 export default React;

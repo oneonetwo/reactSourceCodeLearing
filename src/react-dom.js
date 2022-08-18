@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-08-16 22:29:22
+ * @LastEditTime: 2022-08-18 22:31:10
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -39,6 +39,42 @@ export function useState(initialState) {
         scheduleUpdate();
     }
     return [hookState[hookIndex++], setState]
+}
+export function useMemo(factory, deps) { 
+    if (hookState[hookIndex]) {
+        let [lastMemo, lastDeps ] = hookState[hookIndex];
+        let everySame = deps.every((item, index) => lastDeps[index] === item);
+        if (everySame) {
+            hookIndex++;
+            return lastMemo;
+        } else { 
+            let newMemo = factory();
+            hookState[hookIndex++] = [newMemo, deps];
+            return newMemo;
+        }
+    } else { 
+        //首次
+        let newMemo = factory();
+        hookState[hookIndex++] = [newMemo, deps];
+        return newMemo;
+    }
+}
+export function useCallback(callback, deps) { 
+    if (hookState[hookIndex]) {
+        let [lastCallback, lastDeps ] = hookState[hookIndex];
+        let everySame = deps.every((item, index) => lastDeps[index] === item);
+        if (everySame) {
+            hookIndex++;
+            return lastCallback;
+        } else { 
+            hookState[hookIndex++] = [callback, deps];
+            return callback;
+        }
+    } else { 
+        //首次
+        hookState[hookIndex++] = [callback, deps];
+        return callback;
+    }
 }
 /**
  * 把虚拟dom转成真实的dom 
