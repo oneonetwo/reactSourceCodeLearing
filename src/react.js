@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-08-21 14:22:06
+ * @LastEditTime: 2022-08-21 14:58:23
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -108,6 +108,9 @@ export function memo(type, compare=shallowEqual) {
         compare
     }
 }
+export function useContext(context) { 
+    return context._currentValue;
+}
 const React = {
     createElement,
     cloneElement,
@@ -120,7 +123,8 @@ const React = {
     useState,
     useReducer,
     useMemo,
-    useCallback
+    useCallback,
+    useContext
 }
 
 export default React;
