@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-08-21 14:38:41
+ * @LastEditTime: 2022-08-21 20:46:12
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -26,6 +26,28 @@ function mount(vdom, container) {
      let newDOM = createDOM(vdom);
      container.appendChild(newDOM);
      if (newDOM.componentDidMount) newDOM.componentDidMount();
+}
+
+export function useEffect(callback, deps) { 
+    if (hookState[hookIndex]) { 
+        let [destory, lastDeps] = hookState[hookIndex];
+        let everySame = deps.every((item, index) => lastDeps[index] === item);
+        if (everySame) hookIndex++;
+        else { 
+            destory && destory();
+            setTimeout(() => { 
+                let destory = callback();
+                hookState[hookIndex++] = [destory, deps];
+
+            })
+        }
+    } else {
+        //初次渲染的时候，开启一个宏任务，在宏任务执行callback,c保存销毁的函数和依赖数组
+        setTimeout(() => { 
+            let destory =  callback();
+            hookState[hookIndex++] = [destory, deps];
+        })
+    }
 }
 export function useReducer(reducer, initialState) { 
     if (!hookState[hookIndex]) {
