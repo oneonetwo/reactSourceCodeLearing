@@ -2,7 +2,7 @@
  * @Author: jingyuan.yang jingyuan.yang@prnasia.com
  * @Date: 2022-07-17 21:49:51
  * @LastEditors: yjy
- * @LastEditTime: 2022-08-18 22:31:10
+ * @LastEditTime: 2022-08-21 14:38:41
  * @FilePath: \zhufeng2022react_self\src\react-dom.js
  * @Description: 这是默认设置,请设置`customMade`, 打开koroFileHeader查看配置 进行设置: https://github.com/OBKoro1/koro1FileHeader/wiki/%E9%85%8D%E7%BD%AE
  */
@@ -27,7 +27,20 @@ function mount(vdom, container) {
      container.appendChild(newDOM);
      if (newDOM.componentDidMount) newDOM.componentDidMount();
 }
-
+export function useReducer(reducer, initialState) { 
+    if (!hookState[hookIndex]) {
+        hookState[hookIndex] = initialState;
+    }
+    let currentIndex = hookIndex;
+    function dispatch(action) {
+        hookState[currentIndex] = reducer?reducer(hookState[currentIndex], action): action;
+        scheduleUpdate();
+    }
+    return [hookState[hookIndex], dispatch];
+}
+// export function useState(initialState) { 
+//     return useReducer(null, initialState);
+// }
 export function useState(initialState) { 
     if (!hookState[hookIndex]) { 
         hookState[hookIndex] = hookState[hookIndex] || initialState;
@@ -76,6 +89,7 @@ export function useCallback(callback, deps) {
         return callback;
     }
 }
+
 /**
  * 把虚拟dom转成真实的dom 
  */
