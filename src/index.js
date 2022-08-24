@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 11:23:41
- * @LastEditTime: 2022-08-21 20:36:23
+ * @LastEditTime: 2022-08-24 22:58:00
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -11,27 +11,21 @@
 import ReactDOM from './react-dom.js';
 import React from './react.js';
 
-function Counter() { 
-
-}
-function App() { 
-    const [number, setNumber] = React.useState(0)
-    
-    React.useEffect(() => {
-        let timer = setTimeout(() => { 
-            setNumber(number + 1);
-        }, 1000)
-        return () => {
-            clearTimeout(timer);
-        };
-    }, [number]);
-
-    return <div>
-        { number }
-    </div>
+const Animation = () => {
+    const ref = React.useRef();
+    let style = {
+        width: '100px',
+        height: '100px',
+        backgroundColor: 'red',
+        transition: 'all 500ms',
+    }
+    React.useLayoutEffect(() => { 
+        ref.current.style.transform = 'translate(500px)';
+    })
+    return <div style={style} ref={ ref}>内容</div>  
 }
 
-ReactDOM.render(<App/> , document.getElementById('root'));
+ReactDOM.render(<Animation/> , document.getElementById('root'));
 
 
 
