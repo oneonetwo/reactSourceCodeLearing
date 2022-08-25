@@ -2,7 +2,7 @@
  * @Description: 
  * @Author: yjy
  * @Date: 2022-07-17 21:23:33
- * @LastEditTime: 2022-08-24 22:55:39
+ * @LastEditTime: 2022-08-25 22:16:12
  * @LastEditors: yjy
  * @Reference: 
  */
@@ -111,6 +111,10 @@ export function memo(type, compare=shallowEqual) {
 export function useContext(context) { 
     return context._currentValue;
 }
+
+export function useImperativeHandle(ref, factory) { 
+    return ref.current = factory();
+}
 const React = {
     createElement,
     cloneElement,
@@ -127,7 +131,8 @@ const React = {
     useContext,
     useEffect,
     useLayoutEffect,
-    useRef
+    useRef,
+    useImperativeHandle
 }
 
 export default React;
