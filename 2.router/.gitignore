@@ -2,7 +2,6 @@
 
 # dependencies
 /node_modules
-/2.router/node_modules
 /.pnp
 .pnp.js
 
